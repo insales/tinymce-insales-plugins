@@ -3893,7 +3893,11 @@
 	            } else {
 	                css["border-color"] = data.borderColor;
 	                css["border-width"] = addSizeSuffix(data.borderWidth);
-	                css["border-style"] = "solid";
+	                if (data.borderColor || data.borderWidth) {
+	                    css["border-style"] = "solid";
+	                } else {
+	                    css["border-style"] = "";
+	                }
 	                css["background-color"] = data.backgroundColor;
 	            }
 
