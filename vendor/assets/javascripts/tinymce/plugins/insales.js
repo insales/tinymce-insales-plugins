@@ -985,7 +985,7 @@
 	        label: "Source",
 	        autofocus: true,
 	        onchange: this.handleSrcChange
-	      }, this.createImageListControl('image_list', this.editor.convertURL(this.data.src, "src"), onSelectImage), {
+	      }, this.createImageListControl('image_list', this.editor.convertURL(this.data.src || '', "src"), onSelectImage), {
 	        name: 'file',
 	        type: 'textbox',
 	        subtype: 'file',

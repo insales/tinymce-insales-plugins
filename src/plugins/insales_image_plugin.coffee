@@ -328,7 +328,7 @@ class ImageDialog
         autofocus: true
         onchange: @handleSrcChange
       }
-      @createImageListControl('image_list', @editor.convertURL(@data.src, "src"), onSelectImage)
+      @createImageListControl('image_list', @editor.convertURL(@data.src || '', "src"), onSelectImage)
       {
         name: 'file'
         type: 'textbox'
