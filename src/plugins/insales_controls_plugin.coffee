@@ -67,7 +67,6 @@ tinymce.PluginManager.add "insales_controls", (editor) ->
 
   createFormatMenu = ->
     count = 0
-    newFormats = []
 
     createMenu = (formats) ->
       menu = []
@@ -87,10 +86,7 @@ tinymce.PluginManager.add "insales_controls", (editor) ->
             else
               createMenu format.items
         else
-          formatName = format.format or 'custom' + count++
-          if !format.format
-            format.name = formatName
-            newFormats.push format
+          formatName = format.format
           menuItem.format = formatName
           menuItem = tinymce.extend menuItem, { fontFamily: format.fontFamily, fontSize: format.fontSize, cmd: format.cmd, itemStyle: format.itemStyle }
         menu.push menuItem
@@ -135,12 +131,6 @@ tinymce.PluginManager.add "insales_controls", (editor) ->
       else
         menu = createMenu(editor.settings.style_formats or defaultStyleFormats)
       menu
-
-    editor.on 'init', ->
-      tinymce.each newFormats, (format) ->
-        editor.formatter.register format.name, format
-        return
-      return
 
     type: 'menubutton'
     text: 'Formats'

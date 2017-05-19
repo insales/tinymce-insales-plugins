@@ -284,9 +284,8 @@
 	    return editor.execCommand('mceToggleFormat', false, format);
 	  };
 	  createFormatMenu = function() {
-	    var count, createFontselectMenu, createFontsizeMenu, createMenu, createStylesMenu, newFormats;
+	    var count, createFontselectMenu, createFontsizeMenu, createMenu, createStylesMenu;
 	    count = 0;
-	    newFormats = [];
 	    createMenu = function(formats) {
 	      var menu;
 	      menu = [];
@@ -311,11 +310,7 @@
 	            }
 	          })();
 	        } else {
-	          formatName = format.format || 'custom' + count++;
-	          if (!format.format) {
-	            format.name = formatName;
-	            newFormats.push(format);
-	          }
+	          formatName = format.format;
 	          menuItem.format = formatName;
 	          menuItem = tinymce.extend(menuItem, {
 	            fontFamily: format.fontFamily,
@@ -374,11 +369,6 @@
 	      }
 	      return menu;
 	    };
-	    editor.on('init', function() {
-	      tinymce.each(newFormats, function(format) {
-	        editor.formatter.register(format.name, format);
-	      });
-	    });
 	    return {
 	      type: 'menubutton',
 	      text: 'Formats',
