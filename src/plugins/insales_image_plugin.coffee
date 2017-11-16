@@ -65,7 +65,7 @@ isImageNode = (e) ->
 
 
 class ImageDialog
-  constructor: (@editor, @imageList) ->
+  constructor: (@editor) ->
     @settings = @editor.settings
     @win = null
     @imgElm = @editor.selection.getNode()
@@ -196,17 +196,11 @@ class ImageDialog
           @win.find("#width").value @width
           @win.find("#height").value @height
 
-    imageListCtrl = @win.find('#image_list')[0]
-    imageListCtrl.value @editor.convertURL(e.target.value(), "src") if imageListCtrl
-
   handleRolloverChange: (e) =>
     target = if e.target instanceof tinymce.ui.Control
       e.target
     else
       @win.getParentCtrl(e.target)
-
-    rolloverListCtrl = @win.find('#rollover_image_list')[0]
-    rolloverListCtrl.value @editor.convertURL(target.value(), 'src') if rolloverListCtrl
 
   uploadImage: (e) =>
     $input = $(e.target)
@@ -245,19 +239,18 @@ class ImageDialog
     @win.find("#style").value @editor.dom.serializeStyle(@editor.dom.parseStyle(@editor.dom.serializeStyle(css)))
 
   createImageListControl: (name, value, onSelect) ->
-    return unless @imageList
+    onAutocomplete = (e) =>
+      @completionEngine.get e.control.value(), (datums) ->
+        e.control.showAutoComplete(datums)
 
-    type: "listbox"
+    type: "combobox"
     label: "Image list"
     name: name
-    values: buildListItems(@imageList, (item) =>
-      item.value = @editor.convertURL(item.value or item.url, "src")
-    , [
-      text: "None"
-      value: ""
-    ])
     value: value
-    onselect: onSelect
+    onselectitem: onSelect
+    onautocomplete: onAutocomplete
+    onfocusin: onAutocomplete
+    autocomplete: false
 
   createClassListControl: ->
     return unless @editor.settings.image_class_list
@@ -311,13 +304,11 @@ class ImageDialog
 
 
   generalFormItems: ->
-    onSelectImage = (e) =>
-      altCtrl = @win.find("#alt")
-      if not altCtrl.value() or
-      e.lastControl and altCtrl.value() is e.lastControl.text()
-        altCtrl.value e.control.text()
-
-      @win.find("#src").value(e.control.value()).fire "change"
+    onSelectImage = (image) =>
+      @win.find("#alt").value(image.title)
+      @win.find("#src").value(image.value).fire "change"
+      imageListCtrl = @win.find('#image_list')[0]
+      imageListCtrl.value image.title if imageListCtrl
 
     items = [
       {
@@ -394,8 +385,10 @@ class ImageDialog
     ]
 
   rolloverFormItems: ->
-    onSelectImage = (e) =>
-      @win.find("#rollover").value(e.control.value()).fire "change"
+    onSelectImage = (image) =>
+      @win.find("#rollover").value(image.value).fire "change"
+      rolloverListCtrl = @win.find('#rollover_image_list')[0]
+      rolloverListCtrl.value image.title if rolloverListCtrl
 
     [
       {
@@ -435,40 +428,35 @@ class ImageDialog
       bodyType: if panels.length > 1 then 'tabpanel'
       onSubmit: @handleSubmit
 
+    @completionEngine = new Bloodhound
+      queryTokenizer: Bloodhound.tokenizers.nonword
+      datumTokenizer: Bloodhound.tokenizers.obj.nonword('title')
+      remote:
+        url: "#{@editor.settings.image_list}?q=%QUERY"
+        wildcard: '%QUERY'
+      limit: 50
+
+    @completionEngine.initialize(true)
+
 #global tinymce:true
 tinymce.PluginManager.add "insales_image", (editor) ->
-  withImageList = (callback) ->
-    ->
-      imageList = editor.settings.image_list
-      if typeof (imageList) is "string"
-        console.log "ImageList XHR"
-        tinymce.util.XHR.send
-          url: imageList
-          success: (text) ->
-            callback tinymce.util.JSON.parse(text)
-
-      else if typeof (imageList) is "function"
-        imageList callback
-      else
-        callback imageList
-
-  showDialog = (imageList) ->
-    new ImageDialog(editor, imageList).openDialog()
+  showDialog = ->
+    new ImageDialog(editor).openDialog()
 
   editor.addButton "image",
     icon: "image"
     tooltip: "Insert/edit image"
-    onclick: withImageList(showDialog)
+    onclick: showDialog
     stateSelector: "img:not([data-mce-object],[data-mce-placeholder])"
 
   editor.addMenuItem "image",
     icon: "image"
     text: "Insert image"
-    onclick: withImageList(showDialog)
+    onclick: showDialog
     context: "insert"
     prependToContext: true
 
-  editor.addCommand "mceImage", withImageList(showDialog)
+  editor.addCommand "mceImage", showDialog
 
   editor.on 'DblClick', (e) ->
     editor.execCommand('mceImage') if isImageNode e

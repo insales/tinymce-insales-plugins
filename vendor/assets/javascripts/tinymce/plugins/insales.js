@@ -45,7 +45,7 @@
 /*!**********************!*\
   !*** ./src/index.js ***!
   \**********************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	__webpack_require__( /*! ./plugins/insales_contextmenu_plugin */ 1);
 	__webpack_require__( /*! ./plugins/insales_controls_plugin */ 3);
@@ -53,12 +53,12 @@
 	__webpack_require__(/*! ./plugins/insales_table_plugin */ 5);
 
 
-/***/ },
+/***/ }),
 /* 1 */
 /*!*******************************************************!*\
   !*** ./src/plugins/insales_contextmenu_plugin.coffee ***!
   \*******************************************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	
 	/**
@@ -82,7 +82,7 @@
 	  menu = void 0;
 	  contextmenuNeverUseNative = editor.settings.contextmenu_never_use_native;
 	  clipboardEnabled = function() {
-	    var enabled, error;
+	    var enabled;
 	    if (window.tinyMCE.clipboardEnabled != null) {
 	      return window.tinyMCE.clipboardEnabled;
 	    }
@@ -176,21 +176,21 @@
 	});
 
 
-/***/ },
+/***/ }),
 /* 2 */
 /*!**************************!*\
   !*** external "tinymce" ***!
   \**************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = tinymce;
 
-/***/ },
+/***/ }),
 /* 3 */
 /*!****************************************************!*\
   !*** ./src/plugins/insales_controls_plugin.coffee ***!
   \****************************************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	
 	/*
@@ -506,7 +506,7 @@
 	      }
 	    ];
 	    clipboardEnabled = function() {
-	      var enabled, error;
+	      var enabled;
 	      if (window.tinyMCE.clipboardEnabled != null) {
 	        return window.tinyMCE.clipboardEnabled;
 	      }
@@ -540,12 +540,12 @@
 	});
 
 
-/***/ },
+/***/ }),
 /* 4 */
 /*!*************************************************!*\
   !*** ./src/plugins/insales_image_plugin.coffee ***!
   \*************************************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	
 	/*
@@ -639,9 +639,8 @@
 	};
 
 	ImageDialog = (function() {
-	  function ImageDialog(editor1, imageList1) {
+	  function ImageDialog(editor1) {
 	    this.editor = editor1;
-	    this.imageList = imageList1;
 	    this.uploadImage = bind(this.uploadImage, this);
 	    this.handleRolloverChange = bind(this.handleRolloverChange, this);
 	    this.handleSrcChange = bind(this.handleSrcChange, this);
@@ -788,7 +787,7 @@
 	  };
 
 	  ImageDialog.prototype.handleSrcChange = function(e) {
-	    var imageListCtrl, meta, target;
+	    var meta, target;
 	    target = e.target instanceof tinymce.ui.Control ? e.target : this.win.getParentCtrl(e.target);
 	    meta = e.meta || {};
 	    tinymce.each(meta, (function(_this) {
@@ -797,7 +796,7 @@
 	      };
 	    })(this));
 	    if (!meta.width && !meta.height) {
-	      getImageSize(target.value(), (function(_this) {
+	      return getImageSize(target.value(), (function(_this) {
 	        return function(data) {
 	          if (data.width && data.height && _this.editor.settings.image_dimensions) {
 	            _this.width = data.width;
@@ -808,19 +807,11 @@
 	        };
 	      })(this));
 	    }
-	    imageListCtrl = this.win.find('#image_list')[0];
-	    if (imageListCtrl) {
-	      return imageListCtrl.value(this.editor.convertURL(e.target.value(), "src"));
-	    }
 	  };
 
 	  ImageDialog.prototype.handleRolloverChange = function(e) {
-	    var rolloverListCtrl, target;
-	    target = e.target instanceof tinymce.ui.Control ? e.target : this.win.getParentCtrl(e.target);
-	    rolloverListCtrl = this.win.find('#rollover_image_list')[0];
-	    if (rolloverListCtrl) {
-	      return rolloverListCtrl.value(this.editor.convertURL(target.value(), 'src'));
-	    }
+	    var target;
+	    return target = e.target instanceof tinymce.ui.Control ? e.target : this.win.getParentCtrl(e.target);
 	  };
 
 	  ImageDialog.prototype.uploadImage = function(e) {
@@ -874,25 +865,23 @@
 	  };
 
 	  ImageDialog.prototype.createImageListControl = function(name, value, onSelect) {
-	    if (!this.imageList) {
-	      return;
-	    }
+	    var onAutocomplete;
+	    onAutocomplete = (function(_this) {
+	      return function(e) {
+	        return _this.completionEngine.get(e.control.value(), function(datums) {
+	          return e.control.showAutoComplete(datums);
+	        });
+	      };
+	    })(this);
 	    return {
-	      type: "listbox",
+	      type: "combobox",
 	      label: "Image list",
 	      name: name,
-	      values: buildListItems(this.imageList, (function(_this) {
-	        return function(item) {
-	          return item.value = _this.editor.convertURL(item.value || item.url, "src");
-	        };
-	      })(this), [
-	        {
-	          text: "None",
-	          value: ""
-	        }
-	      ]),
 	      value: value,
-	      onselect: onSelect
+	      onselectitem: onSelect,
+	      onautocomplete: onAutocomplete,
+	      onfocusin: onAutocomplete,
+	      autocomplete: false
 	    };
 	  };
 
@@ -958,13 +947,14 @@
 	  ImageDialog.prototype.generalFormItems = function() {
 	    var items, onSelectImage;
 	    onSelectImage = (function(_this) {
-	      return function(e) {
-	        var altCtrl;
-	        altCtrl = _this.win.find("#alt");
-	        if (!altCtrl.value() || e.lastControl && altCtrl.value() === e.lastControl.text()) {
-	          altCtrl.value(e.control.text());
+	      return function(image) {
+	        var imageListCtrl;
+	        _this.win.find("#alt").value(image.title);
+	        _this.win.find("#src").value(image.value).fire("change");
+	        imageListCtrl = _this.win.find('#image_list')[0];
+	        if (imageListCtrl) {
+	          return imageListCtrl.value(image.title);
 	        }
-	        return _this.win.find("#src").value(e.control.value()).fire("change");
 	      };
 	    })(this);
 	    items = [
@@ -1036,8 +1026,13 @@
 	  ImageDialog.prototype.rolloverFormItems = function() {
 	    var onSelectImage;
 	    onSelectImage = (function(_this) {
-	      return function(e) {
-	        return _this.win.find("#rollover").value(e.control.value()).fire("change");
+	      return function(image) {
+	        var rolloverListCtrl;
+	        _this.win.find("#rollover").value(image.value).fire("change");
+	        rolloverListCtrl = _this.win.find('#rollover_image_list')[0];
+	        if (rolloverListCtrl) {
+	          return rolloverListCtrl.value(image.title);
+	        }
 	      };
 	    })(this);
 	    return [
@@ -1075,13 +1070,23 @@
 	        items: this.rolloverFormItems()
 	      });
 	    }
-	    return this.win = this.editor.windowManager.open({
+	    this.win = this.editor.windowManager.open({
 	      title: "Insert/edit image",
 	      data: this.data,
 	      body: panels,
 	      bodyType: panels.length > 1 ? 'tabpanel' : void 0,
 	      onSubmit: this.handleSubmit
 	    });
+	    this.completionEngine = new Bloodhound({
+	      queryTokenizer: Bloodhound.tokenizers.nonword,
+	      datumTokenizer: Bloodhound.tokenizers.obj.nonword('title'),
+	      remote: {
+	        url: this.editor.settings.image_list + "?q=%QUERY",
+	        wildcard: '%QUERY'
+	      },
+	      limit: 50
+	    });
+	    return this.completionEngine.initialize(true);
 	  };
 
 	  return ImageDialog;
@@ -1089,43 +1094,24 @@
 	})();
 
 	tinymce.PluginManager.add("insales_image", function(editor) {
-	  var showDialog, withImageList;
-	  withImageList = function(callback) {
-	    return function() {
-	      var imageList;
-	      imageList = editor.settings.image_list;
-	      if (typeof imageList === "string") {
-	        console.log("ImageList XHR");
-	        return tinymce.util.XHR.send({
-	          url: imageList,
-	          success: function(text) {
-	            return callback(tinymce.util.JSON.parse(text));
-	          }
-	        });
-	      } else if (typeof imageList === "function") {
-	        return imageList(callback);
-	      } else {
-	        return callback(imageList);
-	      }
-	    };
-	  };
-	  showDialog = function(imageList) {
-	    return new ImageDialog(editor, imageList).openDialog();
+	  var showDialog;
+	  showDialog = function() {
+	    return new ImageDialog(editor).openDialog();
 	  };
 	  editor.addButton("image", {
 	    icon: "image",
 	    tooltip: "Insert/edit image",
-	    onclick: withImageList(showDialog),
+	    onclick: showDialog,
 	    stateSelector: "img:not([data-mce-object],[data-mce-placeholder])"
 	  });
 	  editor.addMenuItem("image", {
 	    icon: "image",
 	    text: "Insert image",
-	    onclick: withImageList(showDialog),
+	    onclick: showDialog,
 	    context: "insert",
 	    prependToContext: true
 	  });
-	  editor.addCommand("mceImage", withImageList(showDialog));
+	  editor.addCommand("mceImage", showDialog);
 	  return editor.on('DblClick', function(e) {
 	    if (isImageNode(e)) {
 	      return editor.execCommand('mceImage');
@@ -1134,22 +1120,22 @@
 	});
 
 
-/***/ },
+/***/ }),
 /* 5 */
 /*!*********************************************!*\
   !*** ./src/plugins/insales_table_plugin.js ***!
   \*********************************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(/*! ./table_plugin/Plugin */ 6);
 
 
-/***/ },
+/***/ }),
 /* 6 */
 /*!********************************************!*\
   !*** ./src/plugins/table_plugin/Plugin.js ***!
   \********************************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 	 * Plugin.js
@@ -1774,12 +1760,12 @@
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
-/***/ },
+/***/ }),
 /* 7 */
 /*!***********************************************!*\
   !*** ./src/plugins/table_plugin/TableGrid.js ***!
   \***********************************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 	 * TableGrid.js
@@ -2811,30 +2797,30 @@
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
-/***/ },
+/***/ }),
 /* 8 */
 /*!*************************************!*\
   !*** external "tinymce.util.Tools" ***!
   \*************************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = tinymce.util.Tools;
 
-/***/ },
+/***/ }),
 /* 9 */
 /*!******************************!*\
   !*** external "tinymce.Env" ***!
   \******************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = tinymce.Env;
 
-/***/ },
+/***/ }),
 /* 10 */
 /*!*******************************************!*\
   !*** ./src/plugins/table_plugin/Utils.js ***!
   \*******************************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 	 * Utils.js
@@ -2899,12 +2885,12 @@
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
-/***/ },
+/***/ }),
 /* 11 */
 /*!***********************************************!*\
   !*** ./src/plugins/table_plugin/SplitCols.js ***!
   \***********************************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 	 * SplitCols.js
@@ -3048,12 +3034,12 @@
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
-/***/ },
+/***/ }),
 /* 12 */
 /*!********************************************!*\
   !*** ./src/plugins/table_plugin/Quirks.js ***!
   \********************************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 	 * Quirks.js
@@ -3457,30 +3443,30 @@
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
-/***/ },
+/***/ }),
 /* 13 */
 /*!**********************************!*\
   !*** external "tinymce.util.VK" ***!
   \**********************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = tinymce.util.VK;
 
-/***/ },
+/***/ }),
 /* 14 */
 /*!*************************************!*\
   !*** external "tinymce.util.Delay" ***!
   \*************************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = tinymce.util.Delay;
 
-/***/ },
+/***/ }),
 /* 15 */
 /*!***************************************************!*\
   !*** ./src/plugins/table_plugin/CellSelection.js ***!
   \***************************************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 	 * CellSelection.js
@@ -3701,21 +3687,21 @@
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
-/***/ },
+/***/ }),
 /* 16 */
 /*!*****************************************!*\
   !*** external "tinymce.dom.TreeWalker" ***!
   \*****************************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = tinymce.dom.TreeWalker;
 
-/***/ },
+/***/ }),
 /* 17 */
 /*!*********************************************!*\
   !*** ./src/plugins/table_plugin/Dialogs.js ***!
   \*********************************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 	 * Dialogs.js
@@ -4577,12 +4563,12 @@
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
-/***/ },
+/***/ }),
 /* 18 */
 /*!****************************************!*\
   !*** ./~/css-border-property/index.js ***!
   \****************************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var isColor = __webpack_require__(/*! is-color */ 19)
 	var isLength = __webpack_require__(/*! is-css-length */ 35)
@@ -4626,12 +4612,12 @@
 	}
 
 
-/***/ },
+/***/ }),
 /* 19 */
 /*!*****************************!*\
   !*** ./~/is-color/index.js ***!
   \*****************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var isRgb = __webpack_require__(/*! ./lib/isRgb */ 20)
 	var isRgba = __webpack_require__(/*! ./lib/isRgba */ 22)
@@ -4659,12 +4645,12 @@
 	module.exports.isTransparent = isTransparent
 
 
-/***/ },
+/***/ }),
 /* 20 */
 /*!*********************************!*\
   !*** ./~/is-color/lib/isRgb.js ***!
   \*********************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var rgbRegex = __webpack_require__(/*! rgb-regex */ 21)
 
@@ -4673,12 +4659,12 @@
 	}
 
 
-/***/ },
+/***/ }),
 /* 21 */
 /*!******************************!*\
   !*** ./~/rgb-regex/index.js ***!
   \******************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -4691,12 +4677,12 @@
 	}
 
 
-/***/ },
+/***/ }),
 /* 22 */
 /*!**********************************!*\
   !*** ./~/is-color/lib/isRgba.js ***!
   \**********************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var rgbaRegex = __webpack_require__(/*! rgba-regex */ 23)
 
@@ -4707,12 +4693,12 @@
 	module.exports = isRgba
 
 
-/***/ },
+/***/ }),
 /* 23 */
 /*!*******************************!*\
   !*** ./~/rgba-regex/index.js ***!
   \*******************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -4725,12 +4711,12 @@
 	}
 
 
-/***/ },
+/***/ }),
 /* 24 */
 /*!*********************************!*\
   !*** ./~/is-color/lib/isHsl.js ***!
   \*********************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var hslRegex = __webpack_require__(/*! hsl-regex */ 25)
 
@@ -4741,12 +4727,12 @@
 	module.exports = isHsl
 
 
-/***/ },
+/***/ }),
 /* 25 */
 /*!******************************!*\
   !*** ./~/hsl-regex/index.js ***!
   \******************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -4759,12 +4745,12 @@
 	}
 
 
-/***/ },
+/***/ }),
 /* 26 */
 /*!**********************************!*\
   !*** ./~/is-color/lib/isHsla.js ***!
   \**********************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var hslaRegex = __webpack_require__(/*! hsla-regex */ 27)
 
@@ -4775,12 +4761,12 @@
 	module.exports = isHsla
 
 
-/***/ },
+/***/ }),
 /* 27 */
 /*!*******************************!*\
   !*** ./~/hsla-regex/index.js ***!
   \*******************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -4793,12 +4779,12 @@
 	}
 
 
-/***/ },
+/***/ }),
 /* 28 */
 /*!*********************************!*\
   !*** ./~/is-color/lib/isHex.js ***!
   \*********************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var hexRegex = __webpack_require__(/*! hex-color-regex */ 29)
 
@@ -4809,12 +4795,12 @@
 	module.exports = isHex
 
 
-/***/ },
+/***/ }),
 /* 29 */
 /*!************************************!*\
   !*** ./~/hex-color-regex/index.js ***!
   \************************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/*!
 	 * hex-color-regex <https://github.com/regexps/hex-color-regex>
@@ -4825,19 +4811,21 @@
 
 	'use strict'
 
-	module.exports = function hexColorRegex (opts) {
+	module.exports = function hexColorRegex(opts) {
 	  opts = opts && typeof opts === 'object' ? opts : {}
 
-	  return opts.strict ? /^#([a-f0-9]{6}|[a-f0-9]{3})\b$/i : /#([a-f0-9]{6}|[a-f0-9]{3})\b/gi
+	  return opts.strict
+	    ? /^#([a-f0-9]{3,4}|[a-f0-9]{4}(?:[a-f0-9]{2}){1,2})\b$/i
+	    : /#([a-f0-9]{3}|[a-f0-9]{4}(?:[a-f0-9]{2}){0,2})\b/gi
 	}
 
 
-/***/ },
+/***/ }),
 /* 30 */
 /*!*************************************!*\
   !*** ./~/is-color/lib/isKeyword.js ***!
   \*************************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var keywords = __webpack_require__(/*! css-color-names */ 31)
 
@@ -4848,170 +4836,21 @@
 	module.exports = isKeyword
 
 
-/***/ },
+/***/ }),
 /* 31 */
 /*!************************************************!*\
   !*** ./~/css-color-names/css-color-names.json ***!
   \************************************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
-	module.exports = {
-		"aqua": "#00ffff",
-		"aliceblue": "#f0f8ff",
-		"antiquewhite": "#faebd7",
-		"black": "#000000",
-		"blue": "#0000ff",
-		"cyan": "#00ffff",
-		"darkblue": "#00008b",
-		"darkcyan": "#008b8b",
-		"darkgreen": "#006400",
-		"darkturquoise": "#00ced1",
-		"deepskyblue": "#00bfff",
-		"green": "#008000",
-		"lime": "#00ff00",
-		"mediumblue": "#0000cd",
-		"mediumspringgreen": "#00fa9a",
-		"navy": "#000080",
-		"springgreen": "#00ff7f",
-		"teal": "#008080",
-		"midnightblue": "#191970",
-		"dodgerblue": "#1e90ff",
-		"lightseagreen": "#20b2aa",
-		"forestgreen": "#228b22",
-		"seagreen": "#2e8b57",
-		"darkslategray": "#2f4f4f",
-		"darkslategrey": "#2f4f4f",
-		"limegreen": "#32cd32",
-		"mediumseagreen": "#3cb371",
-		"turquoise": "#40e0d0",
-		"royalblue": "#4169e1",
-		"steelblue": "#4682b4",
-		"darkslateblue": "#483d8b",
-		"mediumturquoise": "#48d1cc",
-		"indigo": "#4b0082",
-		"darkolivegreen": "#556b2f",
-		"cadetblue": "#5f9ea0",
-		"cornflowerblue": "#6495ed",
-		"mediumaquamarine": "#66cdaa",
-		"dimgray": "#696969",
-		"dimgrey": "#696969",
-		"slateblue": "#6a5acd",
-		"olivedrab": "#6b8e23",
-		"slategray": "#708090",
-		"slategrey": "#708090",
-		"lightslategray": "#778899",
-		"lightslategrey": "#778899",
-		"mediumslateblue": "#7b68ee",
-		"lawngreen": "#7cfc00",
-		"aquamarine": "#7fffd4",
-		"chartreuse": "#7fff00",
-		"gray": "#808080",
-		"grey": "#808080",
-		"maroon": "#800000",
-		"olive": "#808000",
-		"purple": "#800080",
-		"lightskyblue": "#87cefa",
-		"skyblue": "#87ceeb",
-		"blueviolet": "#8a2be2",
-		"darkmagenta": "#8b008b",
-		"darkred": "#8b0000",
-		"saddlebrown": "#8b4513",
-		"darkseagreen": "#8fbc8f",
-		"lightgreen": "#90ee90",
-		"mediumpurple": "#9370db",
-		"darkviolet": "#9400d3",
-		"palegreen": "#98fb98",
-		"darkorchid": "#9932cc",
-		"yellowgreen": "#9acd32",
-		"sienna": "#a0522d",
-		"brown": "#a52a2a",
-		"darkgray": "#a9a9a9",
-		"darkgrey": "#a9a9a9",
-		"greenyellow": "#adff2f",
-		"lightblue": "#add8e6",
-		"paleturquoise": "#afeeee",
-		"lightsteelblue": "#b0c4de",
-		"powderblue": "#b0e0e6",
-		"firebrick": "#b22222",
-		"darkgoldenrod": "#b8860b",
-		"mediumorchid": "#ba55d3",
-		"rosybrown": "#bc8f8f",
-		"darkkhaki": "#bdb76b",
-		"silver": "#c0c0c0",
-		"mediumvioletred": "#c71585",
-		"indianred": "#cd5c5c",
-		"peru": "#cd853f",
-		"chocolate": "#d2691e",
-		"tan": "#d2b48c",
-		"lightgray": "#d3d3d3",
-		"lightgrey": "#d3d3d3",
-		"thistle": "#d8bfd8",
-		"goldenrod": "#daa520",
-		"orchid": "#da70d6",
-		"palevioletred": "#db7093",
-		"crimson": "#dc143c",
-		"gainsboro": "#dcdcdc",
-		"plum": "#dda0dd",
-		"burlywood": "#deb887",
-		"lightcyan": "#e0ffff",
-		"lavender": "#e6e6fa",
-		"darksalmon": "#e9967a",
-		"palegoldenrod": "#eee8aa",
-		"violet": "#ee82ee",
-		"azure": "#f0ffff",
-		"honeydew": "#f0fff0",
-		"khaki": "#f0e68c",
-		"lightcoral": "#f08080",
-		"sandybrown": "#f4a460",
-		"beige": "#f5f5dc",
-		"mintcream": "#f5fffa",
-		"wheat": "#f5deb3",
-		"whitesmoke": "#f5f5f5",
-		"ghostwhite": "#f8f8ff",
-		"lightgoldenrodyellow": "#fafad2",
-		"linen": "#faf0e6",
-		"salmon": "#fa8072",
-		"oldlace": "#fdf5e6",
-		"bisque": "#ffe4c4",
-		"blanchedalmond": "#ffebcd",
-		"coral": "#ff7f50",
-		"cornsilk": "#fff8dc",
-		"darkorange": "#ff8c00",
-		"deeppink": "#ff1493",
-		"floralwhite": "#fffaf0",
-		"fuchsia": "#ff00ff",
-		"gold": "#ffd700",
-		"hotpink": "#ff69b4",
-		"ivory": "#fffff0",
-		"lavenderblush": "#fff0f5",
-		"lemonchiffon": "#fffacd",
-		"lightpink": "#ffb6c1",
-		"lightsalmon": "#ffa07a",
-		"lightyellow": "#ffffe0",
-		"magenta": "#ff00ff",
-		"mistyrose": "#ffe4e1",
-		"moccasin": "#ffe4b5",
-		"navajowhite": "#ffdead",
-		"orange": "#ffa500",
-		"orangered": "#ff4500",
-		"papayawhip": "#ffefd5",
-		"peachpuff": "#ffdab9",
-		"pink": "#ffc0cb",
-		"red": "#ff0000",
-		"seashell": "#fff5ee",
-		"snow": "#fffafa",
-		"tomato": "#ff6347",
-		"white": "#ffffff",
-		"yellow": "#ffff00",
-		"rebeccapurple": "#663399"
-	};
+	module.exports = {"aqua":"#00ffff","aliceblue":"#f0f8ff","antiquewhite":"#faebd7","black":"#000000","blue":"#0000ff","cyan":"#00ffff","darkblue":"#00008b","darkcyan":"#008b8b","darkgreen":"#006400","darkturquoise":"#00ced1","deepskyblue":"#00bfff","green":"#008000","lime":"#00ff00","mediumblue":"#0000cd","mediumspringgreen":"#00fa9a","navy":"#000080","springgreen":"#00ff7f","teal":"#008080","midnightblue":"#191970","dodgerblue":"#1e90ff","lightseagreen":"#20b2aa","forestgreen":"#228b22","seagreen":"#2e8b57","darkslategray":"#2f4f4f","darkslategrey":"#2f4f4f","limegreen":"#32cd32","mediumseagreen":"#3cb371","turquoise":"#40e0d0","royalblue":"#4169e1","steelblue":"#4682b4","darkslateblue":"#483d8b","mediumturquoise":"#48d1cc","indigo":"#4b0082","darkolivegreen":"#556b2f","cadetblue":"#5f9ea0","cornflowerblue":"#6495ed","mediumaquamarine":"#66cdaa","dimgray":"#696969","dimgrey":"#696969","slateblue":"#6a5acd","olivedrab":"#6b8e23","slategray":"#708090","slategrey":"#708090","lightslategray":"#778899","lightslategrey":"#778899","mediumslateblue":"#7b68ee","lawngreen":"#7cfc00","aquamarine":"#7fffd4","chartreuse":"#7fff00","gray":"#808080","grey":"#808080","maroon":"#800000","olive":"#808000","purple":"#800080","lightskyblue":"#87cefa","skyblue":"#87ceeb","blueviolet":"#8a2be2","darkmagenta":"#8b008b","darkred":"#8b0000","saddlebrown":"#8b4513","darkseagreen":"#8fbc8f","lightgreen":"#90ee90","mediumpurple":"#9370db","darkviolet":"#9400d3","palegreen":"#98fb98","darkorchid":"#9932cc","yellowgreen":"#9acd32","sienna":"#a0522d","brown":"#a52a2a","darkgray":"#a9a9a9","darkgrey":"#a9a9a9","greenyellow":"#adff2f","lightblue":"#add8e6","paleturquoise":"#afeeee","lightsteelblue":"#b0c4de","powderblue":"#b0e0e6","firebrick":"#b22222","darkgoldenrod":"#b8860b","mediumorchid":"#ba55d3","rosybrown":"#bc8f8f","darkkhaki":"#bdb76b","silver":"#c0c0c0","mediumvioletred":"#c71585","indianred":"#cd5c5c","peru":"#cd853f","chocolate":"#d2691e","tan":"#d2b48c","lightgray":"#d3d3d3","lightgrey":"#d3d3d3","thistle":"#d8bfd8","goldenrod":"#daa520","orchid":"#da70d6","palevioletred":"#db7093","crimson":"#dc143c","gainsboro":"#dcdcdc","plum":"#dda0dd","burlywood":"#deb887","lightcyan":"#e0ffff","lavender":"#e6e6fa","darksalmon":"#e9967a","palegoldenrod":"#eee8aa","violet":"#ee82ee","azure":"#f0ffff","honeydew":"#f0fff0","khaki":"#f0e68c","lightcoral":"#f08080","sandybrown":"#f4a460","beige":"#f5f5dc","mintcream":"#f5fffa","wheat":"#f5deb3","whitesmoke":"#f5f5f5","ghostwhite":"#f8f8ff","lightgoldenrodyellow":"#fafad2","linen":"#faf0e6","salmon":"#fa8072","oldlace":"#fdf5e6","bisque":"#ffe4c4","blanchedalmond":"#ffebcd","coral":"#ff7f50","cornsilk":"#fff8dc","darkorange":"#ff8c00","deeppink":"#ff1493","floralwhite":"#fffaf0","fuchsia":"#ff00ff","gold":"#ffd700","hotpink":"#ff69b4","ivory":"#fffff0","lavenderblush":"#fff0f5","lemonchiffon":"#fffacd","lightpink":"#ffb6c1","lightsalmon":"#ffa07a","lightyellow":"#ffffe0","magenta":"#ff00ff","mistyrose":"#ffe4e1","moccasin":"#ffe4b5","navajowhite":"#ffdead","orange":"#ffa500","orangered":"#ff4500","papayawhip":"#ffefd5","peachpuff":"#ffdab9","pink":"#ffc0cb","red":"#ff0000","seashell":"#fff5ee","snow":"#fffafa","tomato":"#ff6347","white":"#ffffff","yellow":"#ffff00","rebeccapurple":"#663399"}
 
-/***/ },
+/***/ }),
 /* 32 */
 /*!*************************************!*\
   !*** ./~/is-color/lib/isInherit.js ***!
   \*************************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	function isInherit (str) {
 	  return str === 'inherit'
@@ -5020,12 +4859,12 @@
 	module.exports = isInherit
 
 
-/***/ },
+/***/ }),
 /* 33 */
 /*!******************************************!*\
   !*** ./~/is-color/lib/isCurrentColor.js ***!
   \******************************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	function isCurrentColor (str) {
 	  return str === 'currentColor'
@@ -5034,12 +4873,12 @@
 	module.exports = isCurrentColor
 
 
-/***/ },
+/***/ }),
 /* 34 */
 /*!*****************************************!*\
   !*** ./~/is-color/lib/isTransparent.js ***!
   \*****************************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	function isTransparent (str) {
 	  return str === 'transparent'
@@ -5049,12 +4888,12 @@
 
 
 
-/***/ },
+/***/ }),
 /* 35 */
 /*!**********************************!*\
   !*** ./~/is-css-length/index.js ***!
   \**********************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = function (str) {
 	  var length =  /^(\+|-)?([0-9]*\.)?[0-9]+(em|ex|ch|rem|vh|vw|vmin|vmax|px|mm|cm|in|pt|pc|%)$/i
@@ -5064,12 +4903,12 @@
 	}
 
 
-/***/ },
+/***/ }),
 /* 36 */
 /*!************************************!*\
   !*** ./~/is-border-style/index.js ***!
   \************************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = function (str) {
 	  var value = /^(none|hidden|dotted|dashed|solid|double|groove|ridge|inset|outset)$/i
@@ -5077,12 +4916,12 @@
 	}
 
 
-/***/ },
+/***/ }),
 /* 37 */
 /*!************************************************!*\
   !*** ./src/plugins/table_plugin/ResizeBars.js ***!
   \************************************************/
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 	 * ResizeBars.js
@@ -6072,14 +5911,14 @@
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
-/***/ },
+/***/ }),
 /* 38 */
 /*!****************************************!*\
   !*** external "tinymce.PluginManager" ***!
   \****************************************/
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = tinymce.PluginManager;
 
-/***/ }
+/***/ })
 /******/ ]);
