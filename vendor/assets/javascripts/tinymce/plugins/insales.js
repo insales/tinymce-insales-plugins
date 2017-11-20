@@ -1046,7 +1046,7 @@
 	  };
 
 	  ImageDialog.prototype.openDialog = function() {
-	    var panels;
+	    var panels, urlSeparator;
 	    panels = [
 	      {
 	        title: "General",
@@ -1077,11 +1077,12 @@
 	      bodyType: panels.length > 1 ? 'tabpanel' : void 0,
 	      onSubmit: this.handleSubmit
 	    });
+	    urlSeparator = this.editor.settings.image_list.indexOf('?') === -1 ? '?' : '&';
 	    this.completionEngine = new Bloodhound({
 	      queryTokenizer: Bloodhound.tokenizers.nonword,
 	      datumTokenizer: Bloodhound.tokenizers.obj.nonword('title'),
 	      remote: {
-	        url: this.editor.settings.image_list + "?q=%QUERY",
+	        url: "" + this.editor.settings.image_list + urlSeparator + "q=%QUERY",
 	        wildcard: '%QUERY'
 	      },
 	      limit: 50

@@ -428,11 +428,13 @@ class ImageDialog
       bodyType: if panels.length > 1 then 'tabpanel'
       onSubmit: @handleSubmit
 
+    urlSeparator = if @editor.settings.image_list.indexOf('?') == -1 then '?' else '&'
+
     @completionEngine = new Bloodhound
       queryTokenizer: Bloodhound.tokenizers.nonword
       datumTokenizer: Bloodhound.tokenizers.obj.nonword('title')
       remote:
-        url: "#{@editor.settings.image_list}?q=%QUERY"
+        url: "#{@editor.settings.image_list}#{urlSeparator}q=%QUERY"
         wildcard: '%QUERY'
       limit: 50
 
