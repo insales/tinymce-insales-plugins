@@ -47,146 +47,13 @@
   \**********************/
 /***/ (function(module, exports, __webpack_require__) {
 
-	__webpack_require__( /*! ./plugins/insales_contextmenu_plugin */ 1);
-	__webpack_require__( /*! ./plugins/insales_controls_plugin */ 3);
-	__webpack_require__( /*! ./plugins/insales_image_plugin */ 4);
-	__webpack_require__(/*! ./plugins/insales_table_plugin */ 5);
+	__webpack_require__( /*! ./plugins/insales_controls_plugin */ 1);
+	__webpack_require__( /*! ./plugins/insales_image_plugin */ 3);
+	__webpack_require__(/*! ./plugins/insales_table_plugin */ 4);
 
 
 /***/ }),
 /* 1 */
-/*!*******************************************************!*\
-  !*** ./src/plugins/insales_contextmenu_plugin.coffee ***!
-  \*******************************************************/
-/***/ (function(module, exports, __webpack_require__) {
-
-	
-	/**
-	 * plugin.js
-	 *
-	 * Copyright, Moxiecode Systems AB
-	 * Released under LGPL License.
-	 *
-	 * License: http://www.tinymce.com/license
-	 * Contributing: http://www.tinymce.com/contributing
-	 */
-
-	/* Forked for InSales */
-	var tinymce,
-	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
-
-	tinymce = __webpack_require__(/*! tinymce */ 2);
-
-	tinymce.PluginManager.add('insales_contextmenu', function(editor) {
-	  var clipboardEnabled, contextmenuNeverUseNative, exclude, menu;
-	  menu = void 0;
-	  contextmenuNeverUseNative = editor.settings.contextmenu_never_use_native;
-	  clipboardEnabled = function() {
-	    var enabled;
-	    if (window.tinyMCE.clipboardEnabled != null) {
-	      return window.tinyMCE.clipboardEnabled;
-	    }
-	    try {
-	      enabled = editor.getDoc().execCommand('copy');
-	    } catch (error) {
-	      window.tinyMCE.clipboardEnabled = false;
-	      return false;
-	    }
-	    return window.tinyMCE.clipboardEnabled = enabled;
-	  };
-	  exclude = function(list, values) {
-	    var item, j, len, results;
-	    results = [];
-	    for (j = 0, len = list.length; j < len; j++) {
-	      item = list[j];
-	      if (indexOf.call(values, item) < 0) {
-	        results.push(item);
-	      }
-	    }
-	    return results;
-	  };
-	  editor.on('contextmenu', function(e) {
-	    var contextmenu, doc, i, items, pos;
-	    contextmenu = void 0;
-	    doc = editor.getDoc();
-	    if (e.ctrlKey && !contextmenuNeverUseNative) {
-	      return;
-	    }
-	    e.preventDefault();
-
-	    /**
-	     * WebKit/Blink on Mac has the odd behavior of selecting the target word or line this causes
-	     * issues when for example inserting images see: #7022
-	     */
-	    if (tinymce.Env.mac && tinymce.Env.webkit) {
-	      if (e.button === 2 && doc.caretRangeFromPoint) {
-	        editor.selection.setRng(doc.caretRangeFromPoint(e.x, e.y));
-	      }
-	    }
-	    contextmenu = (editor.settings.contextmenu || 'link image inserttable | cell row column deletetable').split(/[ ,]/);
-	    if (!clipboardEnabled()) {
-	      contextmenu = exclude(contextmenu, ['copy', 'cut', 'paste', 'pastetext']);
-	    }
-	    if (!menu) {
-	      items = [];
-	      tinymce.each(contextmenu, function(name) {
-	        var item;
-	        item = editor.menuItems[name];
-	        if (name === '|') {
-	          item = {
-	            text: name
-	          };
-	        }
-	        if (item) {
-	          item.shortcut = '';
-	          items.push(item);
-	        }
-	      });
-	      i = 0;
-	      while (i < items.length) {
-	        if (items[i].text === '|') {
-	          if (i === 0 || i === items.length - 1) {
-	            items.splice(i, 1);
-	          }
-	        }
-	        i++;
-	      }
-	      menu = new tinymce.ui.Menu({
-	        items: items,
-	        context: 'contextmenu'
-	      }).addClass('contextmenu').renderTo();
-	      editor.on('remove', function() {
-	        menu.remove();
-	        menu = null;
-	      });
-	    } else {
-	      menu.show();
-	    }
-	    pos = {
-	      x: e.pageX,
-	      y: e.pageY
-	    };
-	    if (!editor.inline) {
-	      pos = tinymce.DOM.getPos(editor.getContentAreaContainer());
-	      pos.x += e.clientX;
-	      pos.y += e.clientY;
-	    }
-	    menu.moveTo(pos.x, pos.y);
-	  });
-	});
-
-
-/***/ }),
-/* 2 */
-/*!**************************!*\
-  !*** external "tinymce" ***!
-  \**************************/
-/***/ (function(module, exports) {
-
-	module.exports = tinymce;
-
-/***/ }),
-/* 3 */
 /*!****************************************************!*\
   !*** ./src/plugins/insales_controls_plugin.coffee ***!
   \****************************************************/
@@ -541,7 +408,16 @@
 
 
 /***/ }),
-/* 4 */
+/* 2 */
+/*!**************************!*\
+  !*** external "tinymce" ***!
+  \**************************/
+/***/ (function(module, exports) {
+
+	module.exports = tinymce;
+
+/***/ }),
+/* 3 */
 /*!*************************************************!*\
   !*** ./src/plugins/insales_image_plugin.coffee ***!
   \*************************************************/
@@ -1122,17 +998,17 @@
 
 
 /***/ }),
-/* 5 */
+/* 4 */
 /*!*********************************************!*\
   !*** ./src/plugins/insales_table_plugin.js ***!
   \*********************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(/*! ./table_plugin/Plugin */ 6);
+	module.exports = __webpack_require__(/*! ./table_plugin/Plugin */ 5);
 
 
 /***/ }),
-/* 6 */
+/* 5 */
 /*!********************************************!*\
   !*** ./src/plugins/table_plugin/Plugin.js ***!
   \********************************************/
@@ -1155,15 +1031,15 @@
 	 * @private
 	 */
 	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [
-	    __webpack_require__(/*! tinymce/tableplugin/TableGrid */ 7),
-	    __webpack_require__(/*! tinymce/tableplugin/Quirks */ 12),
-	    __webpack_require__(/*! tinymce/tableplugin/CellSelection */ 15),
-	    __webpack_require__(/*! tinymce/tableplugin/Dialogs */ 17),
-	    __webpack_require__(/*! tinymce/tableplugin/ResizeBars */ 37),
-	    __webpack_require__(/*! tinymce/util/Tools */ 8),
-	    __webpack_require__(/*! tinymce/dom/TreeWalker */ 16),
-	    __webpack_require__(/*! tinymce/Env */ 9),
-	    __webpack_require__(/*! tinymce/PluginManager */ 38)
+	    __webpack_require__(/*! tinymce/tableplugin/TableGrid */ 6),
+	    __webpack_require__(/*! tinymce/tableplugin/Quirks */ 11),
+	    __webpack_require__(/*! tinymce/tableplugin/CellSelection */ 14),
+	    __webpack_require__(/*! tinymce/tableplugin/Dialogs */ 16),
+	    __webpack_require__(/*! tinymce/tableplugin/ResizeBars */ 36),
+	    __webpack_require__(/*! tinymce/util/Tools */ 7),
+	    __webpack_require__(/*! tinymce/dom/TreeWalker */ 15),
+	    __webpack_require__(/*! tinymce/Env */ 8),
+	    __webpack_require__(/*! tinymce/PluginManager */ 37)
 	], __WEBPACK_AMD_DEFINE_RESULT__ = function(TableGrid, Quirks, CellSelection, Dialogs, ResizeBars, Tools, TreeWalker, Env, PluginManager) {
 	    var each = Tools.each;
 
@@ -1762,7 +1638,7 @@
 
 
 /***/ }),
-/* 7 */
+/* 6 */
 /*!***********************************************!*\
   !*** ./src/plugins/table_plugin/TableGrid.js ***!
   \***********************************************/
@@ -1787,10 +1663,10 @@
 	 * @private
 	 */
 	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [
-		__webpack_require__(/*! tinymce/util/Tools */ 8),
-		__webpack_require__(/*! tinymce/Env */ 9),
-		__webpack_require__(/*! tinymce/tableplugin/Utils */ 10),
-		__webpack_require__(/*! tinymce/tableplugin/SplitCols */ 11)
+		__webpack_require__(/*! tinymce/util/Tools */ 7),
+		__webpack_require__(/*! tinymce/Env */ 8),
+		__webpack_require__(/*! tinymce/tableplugin/Utils */ 9),
+		__webpack_require__(/*! tinymce/tableplugin/SplitCols */ 10)
 	], __WEBPACK_AMD_DEFINE_RESULT__ = function(Tools, Env, Utils, SplitCols) {
 		var each = Tools.each, getSpanVal = Utils.getSpanVal, setSpanVal = Utils.setSpanVal;
 
@@ -2799,7 +2675,7 @@
 
 
 /***/ }),
-/* 8 */
+/* 7 */
 /*!*************************************!*\
   !*** external "tinymce.util.Tools" ***!
   \*************************************/
@@ -2808,7 +2684,7 @@
 	module.exports = tinymce.util.Tools;
 
 /***/ }),
-/* 9 */
+/* 8 */
 /*!******************************!*\
   !*** external "tinymce.Env" ***!
   \******************************/
@@ -2817,7 +2693,7 @@
 	module.exports = tinymce.Env;
 
 /***/ }),
-/* 10 */
+/* 9 */
 /*!*******************************************!*\
   !*** ./src/plugins/table_plugin/Utils.js ***!
   \*******************************************/
@@ -2840,7 +2716,7 @@
 	 * @private
 	 */
 	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [
-		__webpack_require__(/*! tinymce/Env */ 9)
+		__webpack_require__(/*! tinymce/Env */ 8)
 	], __WEBPACK_AMD_DEFINE_RESULT__ = function(Env) {
 		var setSpanVal = function (name) {
 			return function (td, val) {
@@ -2887,7 +2763,7 @@
 
 
 /***/ }),
-/* 11 */
+/* 10 */
 /*!***********************************************!*\
   !*** ./src/plugins/table_plugin/SplitCols.js ***!
   \***********************************************/
@@ -2910,8 +2786,8 @@
 	 * @private
 	 */
 	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [
-		__webpack_require__(/*! tinymce/util/Tools */ 8),
-		__webpack_require__(/*! tinymce/tableplugin/Utils */ 10)
+		__webpack_require__(/*! tinymce/util/Tools */ 7),
+		__webpack_require__(/*! tinymce/tableplugin/Utils */ 9)
 	], __WEBPACK_AMD_DEFINE_RESULT__ = function(Tools, Utils) {
 		var getCellAt = function (grid, x, y) {
 			return grid[y] ? grid[y][x] : null;
@@ -3036,7 +2912,7 @@
 
 
 /***/ }),
-/* 12 */
+/* 11 */
 /*!********************************************!*\
   !*** ./src/plugins/table_plugin/Quirks.js ***!
   \********************************************/
@@ -3059,11 +2935,11 @@
 	 * @private
 	 */
 	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [
-		__webpack_require__(/*! tinymce/util/VK */ 13),
-		__webpack_require__(/*! tinymce/util/Delay */ 14),
-		__webpack_require__(/*! tinymce/Env */ 9),
-		__webpack_require__(/*! tinymce/util/Tools */ 8),
-		__webpack_require__(/*! tinymce/tableplugin/Utils */ 10)
+		__webpack_require__(/*! tinymce/util/VK */ 12),
+		__webpack_require__(/*! tinymce/util/Delay */ 13),
+		__webpack_require__(/*! tinymce/Env */ 8),
+		__webpack_require__(/*! tinymce/util/Tools */ 7),
+		__webpack_require__(/*! tinymce/tableplugin/Utils */ 9)
 	], __WEBPACK_AMD_DEFINE_RESULT__ = function(VK, Delay, Env, Tools, Utils) {
 		var each = Tools.each, getSpanVal = Utils.getSpanVal;
 
@@ -3445,7 +3321,7 @@
 
 
 /***/ }),
-/* 13 */
+/* 12 */
 /*!**********************************!*\
   !*** external "tinymce.util.VK" ***!
   \**********************************/
@@ -3454,7 +3330,7 @@
 	module.exports = tinymce.util.VK;
 
 /***/ }),
-/* 14 */
+/* 13 */
 /*!*************************************!*\
   !*** external "tinymce.util.Delay" ***!
   \*************************************/
@@ -3463,7 +3339,7 @@
 	module.exports = tinymce.util.Delay;
 
 /***/ }),
-/* 15 */
+/* 14 */
 /*!***************************************************!*\
   !*** ./src/plugins/table_plugin/CellSelection.js ***!
   \***************************************************/
@@ -3487,9 +3363,9 @@
 	 * @private
 	 */
 	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [
-		__webpack_require__(/*! tinymce/tableplugin/TableGrid */ 7),
-		__webpack_require__(/*! tinymce/dom/TreeWalker */ 16),
-		__webpack_require__(/*! tinymce/util/Tools */ 8)
+		__webpack_require__(/*! tinymce/tableplugin/TableGrid */ 6),
+		__webpack_require__(/*! tinymce/dom/TreeWalker */ 15),
+		__webpack_require__(/*! tinymce/util/Tools */ 7)
 	], __WEBPACK_AMD_DEFINE_RESULT__ = function(TableGrid, TreeWalker, Tools) {
 		return function(editor, selectionChange) {
 			var dom = editor.dom, tableGrid, startCell, startTable, lastMouseOverTarget, hasCellSelection = true, resizing, dragging;
@@ -3689,7 +3565,7 @@
 
 
 /***/ }),
-/* 16 */
+/* 15 */
 /*!*****************************************!*\
   !*** external "tinymce.dom.TreeWalker" ***!
   \*****************************************/
@@ -3698,7 +3574,7 @@
 	module.exports = tinymce.dom.TreeWalker;
 
 /***/ }),
-/* 17 */
+/* 16 */
 /*!*********************************************!*\
   !*** ./src/plugins/table_plugin/Dialogs.js ***!
   \*********************************************/
@@ -3723,8 +3599,8 @@
 	 * @private
 	 */
 	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [
-	    __webpack_require__(/*! tinymce/util/Tools */ 8),
-	    __webpack_require__(/*! tinymce/Env */ 9)
+	    __webpack_require__(/*! tinymce/util/Tools */ 7),
+	    __webpack_require__(/*! tinymce/Env */ 8)
 	], __WEBPACK_AMD_DEFINE_RESULT__ = function(Tools, Env) {
 	    var each = Tools.each;
 
@@ -3857,7 +3733,7 @@
 	            var css = dom.parseStyle(data.style);
 
 	            if (css['border']) {
-	                var border = __webpack_require__(/*! css-border-property */ 18).parse(css['border']);
+	                var border = __webpack_require__(/*! css-border-property */ 17).parse(css['border']);
 	                for (var prop in border) {
 	                    css[prop] = prop.value;
 	                }
@@ -3885,7 +3761,7 @@
 	            var css = dom.parseStyle(dom.getAttrib(elm, 'style'));
 
 	            if (css['border']) {
-	                var border = __webpack_require__(/*! css-border-property */ 18).parse(css['border']);
+	                var border = __webpack_require__(/*! css-border-property */ 17).parse(css['border']);
 	                for (var i in border) {
 	                    var prop = border[i];
 	                    css[prop.property] = prop.value;
@@ -4565,15 +4441,15 @@
 
 
 /***/ }),
-/* 18 */
+/* 17 */
 /*!****************************************!*\
   !*** ./~/css-border-property/index.js ***!
   \****************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
-	var isColor = __webpack_require__(/*! is-color */ 19)
-	var isLength = __webpack_require__(/*! is-css-length */ 35)
-	var isStyle = __webpack_require__(/*! is-border-style */ 36)
+	var isColor = __webpack_require__(/*! is-color */ 18)
+	var isLength = __webpack_require__(/*! is-css-length */ 34)
+	var isStyle = __webpack_require__(/*! is-border-style */ 35)
 
 	function isWidth (str) {
 	  return isLength(str) || str === 'thin' || str === 'medium' || str === 'thick'
@@ -4614,21 +4490,21 @@
 
 
 /***/ }),
-/* 19 */
+/* 18 */
 /*!*****************************!*\
   !*** ./~/is-color/index.js ***!
   \*****************************/
 /***/ (function(module, exports, __webpack_require__) {
 
-	var isRgb = __webpack_require__(/*! ./lib/isRgb */ 20)
-	var isRgba = __webpack_require__(/*! ./lib/isRgba */ 22)
-	var isHsl = __webpack_require__(/*! ./lib/isHsl */ 24)
-	var isHsla = __webpack_require__(/*! ./lib/isHsla */ 26)
-	var isHex = __webpack_require__(/*! ./lib/isHex */ 28)
-	var isKeyword = __webpack_require__(/*! ./lib/isKeyword */ 30)
-	var isInherit = __webpack_require__(/*! ./lib/isInherit */ 32)
-	var isCurrentColor = __webpack_require__(/*! ./lib/isCurrentColor */ 33)
-	var isTransparent = __webpack_require__(/*! ./lib/isTransparent */ 34)
+	var isRgb = __webpack_require__(/*! ./lib/isRgb */ 19)
+	var isRgba = __webpack_require__(/*! ./lib/isRgba */ 21)
+	var isHsl = __webpack_require__(/*! ./lib/isHsl */ 23)
+	var isHsla = __webpack_require__(/*! ./lib/isHsla */ 25)
+	var isHex = __webpack_require__(/*! ./lib/isHex */ 27)
+	var isKeyword = __webpack_require__(/*! ./lib/isKeyword */ 29)
+	var isInherit = __webpack_require__(/*! ./lib/isInherit */ 31)
+	var isCurrentColor = __webpack_require__(/*! ./lib/isCurrentColor */ 32)
+	var isTransparent = __webpack_require__(/*! ./lib/isTransparent */ 33)
 
 
 	module.exports = function isColor (str) {
@@ -4647,13 +4523,13 @@
 
 
 /***/ }),
-/* 20 */
+/* 19 */
 /*!*********************************!*\
   !*** ./~/is-color/lib/isRgb.js ***!
   \*********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
-	var rgbRegex = __webpack_require__(/*! rgb-regex */ 21)
+	var rgbRegex = __webpack_require__(/*! rgb-regex */ 20)
 
 	module.exports = function (str) {
 	  return rgbRegex({exact: true}).test(str)
@@ -4661,7 +4537,7 @@
 
 
 /***/ }),
-/* 21 */
+/* 20 */
 /*!******************************!*\
   !*** ./~/rgb-regex/index.js ***!
   \******************************/
@@ -4679,13 +4555,13 @@
 
 
 /***/ }),
-/* 22 */
+/* 21 */
 /*!**********************************!*\
   !*** ./~/is-color/lib/isRgba.js ***!
   \**********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
-	var rgbaRegex = __webpack_require__(/*! rgba-regex */ 23)
+	var rgbaRegex = __webpack_require__(/*! rgba-regex */ 22)
 
 	function isRgba (str) {
 	  return rgbaRegex({exact: true}).test(str)
@@ -4695,7 +4571,7 @@
 
 
 /***/ }),
-/* 23 */
+/* 22 */
 /*!*******************************!*\
   !*** ./~/rgba-regex/index.js ***!
   \*******************************/
@@ -4713,13 +4589,13 @@
 
 
 /***/ }),
-/* 24 */
+/* 23 */
 /*!*********************************!*\
   !*** ./~/is-color/lib/isHsl.js ***!
   \*********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
-	var hslRegex = __webpack_require__(/*! hsl-regex */ 25)
+	var hslRegex = __webpack_require__(/*! hsl-regex */ 24)
 
 	function isHsl (str) {
 	  return hslRegex({exact: true}).test(str)
@@ -4729,7 +4605,7 @@
 
 
 /***/ }),
-/* 25 */
+/* 24 */
 /*!******************************!*\
   !*** ./~/hsl-regex/index.js ***!
   \******************************/
@@ -4747,13 +4623,13 @@
 
 
 /***/ }),
-/* 26 */
+/* 25 */
 /*!**********************************!*\
   !*** ./~/is-color/lib/isHsla.js ***!
   \**********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
-	var hslaRegex = __webpack_require__(/*! hsla-regex */ 27)
+	var hslaRegex = __webpack_require__(/*! hsla-regex */ 26)
 
 	function isHsla (str) {
 	  return hslaRegex({exact: true}).test(str)
@@ -4763,7 +4639,7 @@
 
 
 /***/ }),
-/* 27 */
+/* 26 */
 /*!*******************************!*\
   !*** ./~/hsla-regex/index.js ***!
   \*******************************/
@@ -4781,13 +4657,13 @@
 
 
 /***/ }),
-/* 28 */
+/* 27 */
 /*!*********************************!*\
   !*** ./~/is-color/lib/isHex.js ***!
   \*********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
-	var hexRegex = __webpack_require__(/*! hex-color-regex */ 29)
+	var hexRegex = __webpack_require__(/*! hex-color-regex */ 28)
 
 	function isHex (str) {
 	  return hexRegex({exact: true}).test(str)
@@ -4797,7 +4673,7 @@
 
 
 /***/ }),
-/* 29 */
+/* 28 */
 /*!************************************!*\
   !*** ./~/hex-color-regex/index.js ***!
   \************************************/
@@ -4822,13 +4698,13 @@
 
 
 /***/ }),
-/* 30 */
+/* 29 */
 /*!*************************************!*\
   !*** ./~/is-color/lib/isKeyword.js ***!
   \*************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
-	var keywords = __webpack_require__(/*! css-color-names */ 31)
+	var keywords = __webpack_require__(/*! css-color-names */ 30)
 
 	function isKeyword (str) {
 	  return keywords[str] ? true : false
@@ -4838,7 +4714,7 @@
 
 
 /***/ }),
-/* 31 */
+/* 30 */
 /*!************************************************!*\
   !*** ./~/css-color-names/css-color-names.json ***!
   \************************************************/
@@ -4847,7 +4723,7 @@
 	module.exports = {"aqua":"#00ffff","aliceblue":"#f0f8ff","antiquewhite":"#faebd7","black":"#000000","blue":"#0000ff","cyan":"#00ffff","darkblue":"#00008b","darkcyan":"#008b8b","darkgreen":"#006400","darkturquoise":"#00ced1","deepskyblue":"#00bfff","green":"#008000","lime":"#00ff00","mediumblue":"#0000cd","mediumspringgreen":"#00fa9a","navy":"#000080","springgreen":"#00ff7f","teal":"#008080","midnightblue":"#191970","dodgerblue":"#1e90ff","lightseagreen":"#20b2aa","forestgreen":"#228b22","seagreen":"#2e8b57","darkslategray":"#2f4f4f","darkslategrey":"#2f4f4f","limegreen":"#32cd32","mediumseagreen":"#3cb371","turquoise":"#40e0d0","royalblue":"#4169e1","steelblue":"#4682b4","darkslateblue":"#483d8b","mediumturquoise":"#48d1cc","indigo":"#4b0082","darkolivegreen":"#556b2f","cadetblue":"#5f9ea0","cornflowerblue":"#6495ed","mediumaquamarine":"#66cdaa","dimgray":"#696969","dimgrey":"#696969","slateblue":"#6a5acd","olivedrab":"#6b8e23","slategray":"#708090","slategrey":"#708090","lightslategray":"#778899","lightslategrey":"#778899","mediumslateblue":"#7b68ee","lawngreen":"#7cfc00","aquamarine":"#7fffd4","chartreuse":"#7fff00","gray":"#808080","grey":"#808080","maroon":"#800000","olive":"#808000","purple":"#800080","lightskyblue":"#87cefa","skyblue":"#87ceeb","blueviolet":"#8a2be2","darkmagenta":"#8b008b","darkred":"#8b0000","saddlebrown":"#8b4513","darkseagreen":"#8fbc8f","lightgreen":"#90ee90","mediumpurple":"#9370db","darkviolet":"#9400d3","palegreen":"#98fb98","darkorchid":"#9932cc","yellowgreen":"#9acd32","sienna":"#a0522d","brown":"#a52a2a","darkgray":"#a9a9a9","darkgrey":"#a9a9a9","greenyellow":"#adff2f","lightblue":"#add8e6","paleturquoise":"#afeeee","lightsteelblue":"#b0c4de","powderblue":"#b0e0e6","firebrick":"#b22222","darkgoldenrod":"#b8860b","mediumorchid":"#ba55d3","rosybrown":"#bc8f8f","darkkhaki":"#bdb76b","silver":"#c0c0c0","mediumvioletred":"#c71585","indianred":"#cd5c5c","peru":"#cd853f","chocolate":"#d2691e","tan":"#d2b48c","lightgray":"#d3d3d3","lightgrey":"#d3d3d3","thistle":"#d8bfd8","goldenrod":"#daa520","orchid":"#da70d6","palevioletred":"#db7093","crimson":"#dc143c","gainsboro":"#dcdcdc","plum":"#dda0dd","burlywood":"#deb887","lightcyan":"#e0ffff","lavender":"#e6e6fa","darksalmon":"#e9967a","palegoldenrod":"#eee8aa","violet":"#ee82ee","azure":"#f0ffff","honeydew":"#f0fff0","khaki":"#f0e68c","lightcoral":"#f08080","sandybrown":"#f4a460","beige":"#f5f5dc","mintcream":"#f5fffa","wheat":"#f5deb3","whitesmoke":"#f5f5f5","ghostwhite":"#f8f8ff","lightgoldenrodyellow":"#fafad2","linen":"#faf0e6","salmon":"#fa8072","oldlace":"#fdf5e6","bisque":"#ffe4c4","blanchedalmond":"#ffebcd","coral":"#ff7f50","cornsilk":"#fff8dc","darkorange":"#ff8c00","deeppink":"#ff1493","floralwhite":"#fffaf0","fuchsia":"#ff00ff","gold":"#ffd700","hotpink":"#ff69b4","ivory":"#fffff0","lavenderblush":"#fff0f5","lemonchiffon":"#fffacd","lightpink":"#ffb6c1","lightsalmon":"#ffa07a","lightyellow":"#ffffe0","magenta":"#ff00ff","mistyrose":"#ffe4e1","moccasin":"#ffe4b5","navajowhite":"#ffdead","orange":"#ffa500","orangered":"#ff4500","papayawhip":"#ffefd5","peachpuff":"#ffdab9","pink":"#ffc0cb","red":"#ff0000","seashell":"#fff5ee","snow":"#fffafa","tomato":"#ff6347","white":"#ffffff","yellow":"#ffff00","rebeccapurple":"#663399"}
 
 /***/ }),
-/* 32 */
+/* 31 */
 /*!*************************************!*\
   !*** ./~/is-color/lib/isInherit.js ***!
   \*************************************/
@@ -4861,7 +4737,7 @@
 
 
 /***/ }),
-/* 33 */
+/* 32 */
 /*!******************************************!*\
   !*** ./~/is-color/lib/isCurrentColor.js ***!
   \******************************************/
@@ -4875,7 +4751,7 @@
 
 
 /***/ }),
-/* 34 */
+/* 33 */
 /*!*****************************************!*\
   !*** ./~/is-color/lib/isTransparent.js ***!
   \*****************************************/
@@ -4890,7 +4766,7 @@
 
 
 /***/ }),
-/* 35 */
+/* 34 */
 /*!**********************************!*\
   !*** ./~/is-css-length/index.js ***!
   \**********************************/
@@ -4905,7 +4781,7 @@
 
 
 /***/ }),
-/* 36 */
+/* 35 */
 /*!************************************!*\
   !*** ./~/is-border-style/index.js ***!
   \************************************/
@@ -4918,7 +4794,7 @@
 
 
 /***/ }),
-/* 37 */
+/* 36 */
 /*!************************************************!*\
   !*** ./src/plugins/table_plugin/ResizeBars.js ***!
   \************************************************/
@@ -4942,8 +4818,8 @@
 	 * @private
 	 */
 	!(__WEBPACK_AMD_DEFINE_ARRAY__ = [
-		__webpack_require__(/*! tinymce/util/Tools */ 8),
-		__webpack_require__(/*! tinymce/util/VK */ 13)
+		__webpack_require__(/*! tinymce/util/Tools */ 7),
+		__webpack_require__(/*! tinymce/util/VK */ 12)
 	], __WEBPACK_AMD_DEFINE_RESULT__ = function(Tools, VK) {
 		var hoverTable;
 
@@ -5913,7 +5789,7 @@
 
 
 /***/ }),
-/* 38 */
+/* 37 */
 /*!****************************************!*\
   !*** external "tinymce.PluginManager" ***!
   \****************************************/
