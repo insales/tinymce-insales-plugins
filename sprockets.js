@@ -1,1 +1,1 @@
-//= require vendor/assets/javascripts/tinymce/plugins/insales
+//= require ./vendor/assets/javascripts/tinymce/plugins/insales
