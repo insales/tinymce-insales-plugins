@@ -13,7 +13,7 @@
     "coffee-script": "^1.10.0",
     "css-border-property": "^1.1.0",
     "json-loader": "^0.5.4",
-    "webpack": "^1.13.2"
+    "webpack": "^5.74.0"
   },
   "main": "vendor/assets/javascripts/tinymce/plugins/insales.js"
 }
